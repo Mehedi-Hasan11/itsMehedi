@@ -38,15 +38,15 @@ function typewriter() {
     currentCharIndex++;
   }
 
-  let typeSpeed = isDeleting ? 50 : 100;
+  let typeSpeed = isDeleting ? 120 : 180;
 
   if (!isDeleting && currentCharIndex === currentText.length) {
-    typeSpeed = 2000; // Pause at end
+    typeSpeed = 2800; // Slow pause at end
     isDeleting = true;
   } else if (isDeleting && currentCharIndex === 0) {
     isDeleting = false;
     currentTextIndex = (currentTextIndex + 1) % typewriterTexts.length;
-    typeSpeed = 500; // Pause before next word
+    typeSpeed = 900; // Pause before next word
   }
 
   setTimeout(typewriter, typeSpeed);
@@ -89,17 +89,62 @@ document.querySelectorAll('.stagger-item').forEach(el => {
   staggerObserver.observe(el);
 });
 
-// Contact Form Handler
+// About Read More Toggle
+const aboutToggle = document.getElementById('aboutToggle');
+const aboutMore = document.getElementById('aboutMore');
+
+if (aboutToggle && aboutMore) {
+  aboutToggle.addEventListener('click', () => {
+    const expanded = aboutToggle.getAttribute('aria-expanded') === 'true';
+    aboutToggle.setAttribute('aria-expanded', String(!expanded));
+    aboutMore.hidden = expanded;
+    aboutToggle.textContent = expanded ? 'Read more' : 'Show less';
+  });
+}
+
+// Contact Form Handler + Notification
 const contactForm = document.getElementById('contactForm');
+const notification = document.getElementById('notification');
+const notificationMessage = document.getElementById('notificationMessage');
+const notificationClose = document.getElementById('notificationClose');
+let notificationTimeout;
+
+const hideNotification = () => {
+  if (!notification) return;
+  notification.classList.remove('is-visible');
+  notificationTimeout && clearTimeout(notificationTimeout);
+  setTimeout(() => {
+    if (!notification.classList.contains('is-visible')) {
+      notification.hidden = true;
+    }
+  }, 300);
+};
+
+const showNotification = (message) => {
+  if (!notification || !notificationMessage) return;
+  notificationMessage.textContent = message;
+  notification.hidden = false;
+  requestAnimationFrame(() => notification.classList.add('is-visible'));
+  notificationTimeout && clearTimeout(notificationTimeout);
+  notificationTimeout = setTimeout(hideNotification, 6000);
+};
+
+if (notificationClose) {
+  notificationClose.addEventListener('click', hideNotification);
+}
+
 if (contactForm) {
   contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
 
-    // Simple form handling (you can integrate with a backend service)
-    alert(`Thank you, ${name}! Your message has been received. I'll get back to you at ${email} soon.`);
+    const emailBody = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
+    const subject = encodeURIComponent(`Portfolio inquiry from ${name || 'visitor'}`);
+    window.location.href = `mailto:mehedihasan.fhl@gmail.com?subject=${subject}&body=${emailBody}`;
+
+    showNotification(`Thanks ${name || 'there'}! Your message pinged my inbox.`);
     contactForm.reset();
   });
 }
@@ -154,4 +199,82 @@ mobileMenuLinks.forEach(link => {
     closeMobileMenu();
   });
 });
+
+// Cursor Mesh Effect
+function createCursorMesh() {
+  const mesh = document.createElement('div');
+  mesh.id = 'cursor-mesh';
+  document.body.appendChild(mesh);
+
+  const gridSize = 50;
+  const mouse = { x: 0, y: 0 };
+  const lines = [];
+
+  // Create grid lines
+  for (let i = 0; i < window.innerWidth; i += gridSize) {
+    const line = document.createElement('div');
+    line.className = 'mesh-line vertical';
+    line.style.left = i + 'px';
+    line.style.transform = 'translateX(0)';
+    mesh.appendChild(line);
+    lines.push({ element: line, type: 'vertical', pos: i });
+  }
+
+  for (let i = 0; i < window.innerHeight; i += gridSize) {
+    const line = document.createElement('div');
+    line.className = 'mesh-line horizontal';
+    line.style.top = i + 'px';
+    line.style.transform = 'translateY(0)';
+    mesh.appendChild(line);
+    lines.push({ element: line, type: 'horizontal', pos: i });
+  }
+
+  // Update mouse position
+  document.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+
+    // Update grid lines based on mouse position
+    lines.forEach(line => {
+      if (line.type === 'vertical') {
+        const distance = Math.abs(line.pos - mouse.x);
+        const offset = (distance / gridSize) * 5;
+        line.element.style.transform = `translateX(${offset}px)`;
+        line.element.style.opacity = Math.max(0.1, 0.3 - distance / 500);
+      } else {
+        const distance = Math.abs(line.pos - mouse.y);
+        const offset = (distance / gridSize) * 5;
+        line.element.style.transform = `translateY(${offset}px)`;
+        line.element.style.opacity = Math.max(0.1, 0.3 - distance / 500);
+      }
+    });
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    mesh.innerHTML = '';
+    lines.length = 0;
+    
+    for (let i = 0; i < window.innerWidth; i += gridSize) {
+      const line = document.createElement('div');
+      line.className = 'mesh-line vertical';
+      line.style.left = i + 'px';
+      line.style.transform = 'translateX(0)';
+      mesh.appendChild(line);
+      lines.push({ element: line, type: 'vertical', pos: i });
+    }
+
+    for (let i = 0; i < window.innerHeight; i += gridSize) {
+      const line = document.createElement('div');
+      line.className = 'mesh-line horizontal';
+      line.style.top = i + 'px';
+      line.style.transform = 'translateY(0)';
+      mesh.appendChild(line);
+      lines.push({ element: line, type: 'horizontal', pos: i });
+    }
+  });
+}
+
+// Initialize cursor mesh
+createCursorMesh();
 

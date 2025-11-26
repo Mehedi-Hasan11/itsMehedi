@@ -926,12 +926,25 @@ section {
   bottom: 0;
   left: 50%;
   width: 8px;
-  transform: translateX(-50%) skewY(-3deg) translateY(100%);
-  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+  transform: translateX(-50%) skewY(-3deg);
+  background: rgba(99, 102, 241, 0.25);
   border-radius: 999px;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-  animation: lineRipple 8s ease-in-out infinite, lineSlideUp 1.5s ease-out forwards;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  animation: lineRipple 8s ease-in-out infinite;
   opacity: 0.9;
+  overflow: hidden;
+}
+
+.timeline-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+  border-radius: inherit;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  transform-origin: bottom;
+  transform: scaleY(0);
+  animation: growLine 1.6s ease-out forwards;
 }
 
 .timeline-item {
@@ -942,15 +955,11 @@ section {
 .timeline-item:nth-of-type(odd) {
   grid-column: 1 / 2;
   text-align: right;
-  transform: rotate(-2deg);
-  animation: floatCard 6s ease-in-out infinite;
 }
 
 .timeline-item:nth-of-type(even) {
   grid-column: 2 / 3;
   text-align: left;
-  transform: rotate(2deg);
-  animation: floatCardEven 6s ease-in-out infinite 1.5s;
 }
 
 .timeline-node {
@@ -983,6 +992,11 @@ section {
   box-shadow: var(--shadow-lg);
   position: relative;
   max-width: 420px;
+  animation: floatCard 8s ease-in-out infinite;
+}
+
+.timeline-item:nth-of-type(even) .timeline-content {
+  animation-delay: 1.6s;
 }
 
 .timeline-title {
@@ -1333,19 +1347,10 @@ footer {
 
 @keyframes floatCard {
   0%, 100% {
-    transform: translateY(0) rotate(-2deg);
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-15px) rotate(-2deg);
-  }
-}
-
-@keyframes floatCardEven {
-  0%, 100% {
-    transform: translateY(0) rotate(2deg);
-  }
-  50% {
-    transform: translateY(-15px) rotate(2deg);
+    transform: translateY(-15px);
   }
 }
 
@@ -1368,6 +1373,15 @@ footer {
   to {
     transform: translateX(0) skewY(0) translateY(0);
     opacity: 0.9;
+  }
+}
+
+@keyframes growLine {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
   }
 }
 
@@ -1470,8 +1484,7 @@ footer {
 
   .timeline-line {
     left: 24px;
-    transform: translateX(0) skewY(0) translateY(100%);
-    animation: lineRipple 8s ease-in-out infinite, lineSlideUpMobile 1.5s ease-out forwards;
+    transform: translateX(0) skewY(0);
   }
 
   .timeline-item,
@@ -1480,7 +1493,11 @@ footer {
     grid-column: 1 / -1;
     text-align: left;
     transform: none;
-    padding-left: 70px;
+    padding-left: 56px;
+  }
+
+  .timeline-content {
+    max-width: 100%;
   }
 
   .timeline-node {
@@ -1488,26 +1505,49 @@ footer {
     right: auto;
   }
 
+  .hero-buttons .btn:nth-child(1) {
+    display: none;
+  }
+
+  .hero-buttons .btn:nth-child(2) {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 16px;
+  }
+
+  .hero-buttons .btn:nth-child(3) {
+    padding: 8px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 16px;
+  }
+
   .floating-connect {
-    left: 50%;
-    top: 50%;
+    top: auto;
+    bottom: 24px;
+    left: 16px;
     right: auto;
-    bottom: auto;
-    transform: translate(-50%, -50%) rotate(180deg);
-    flex-direction: row;
-    gap: 12px;
-    animation: floatConnect 12s ease-in-out infinite alternate;
-    justify-content: center;
+    transform: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    animation: none;
   }
 
   .connect-pill {
-    writing-mode: horizontal-tb;
-    letter-spacing: 0.2em;
-    padding: 12px 20px;
+    display: none;
   }
 
   .connect-icons {
-    flex-direction: row;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
   }
 }
 
@@ -1535,7 +1575,9 @@ footer {
 
   .floating-connect {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    left: 12px;
+    bottom: 16px;
   }
 
   .connect-pill {
@@ -1544,8 +1586,8 @@ footer {
   }
 
   .social-btn {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 }
 
